@@ -181,7 +181,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
                   $headers = array('Content-Type: text/html; charset=UTF-8');                              
                   wp_mail($safeEmail, 'Você ganhou um curso!', $message, $headers);
                 }               
-              }              
+              }       
             }
           }
           ?>
@@ -190,7 +190,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
     }
 
     /**
-    * Store the id and name of the purchased courses in an array.. 
+    * Store the id and name of the purchased courses in an array. 
     */
     private function woosei_getCoursesPurchased(){
       $coursesPurchased = new Sensei_Course();  
