@@ -1,0 +1,2 @@
+# WooCommerce Sensei Integration
+This is a custom plugin build for some companies to buy online courses, create users and give them acess to the course bought. Only companies that has CNPJ (Brazilian code to legal person).
