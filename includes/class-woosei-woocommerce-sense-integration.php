@@ -99,7 +99,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
     ?>
       <div id="wpbody" role="main">
           <h1>Inclusão de Usuários</h1>
-          <i>Insira aqui os colaboradores que deverão receber as senhas para o(s) curso(s).</i>
+          <i>Insira abaixo os colaboradores que deverão receber as senhas para o(s) curso(s):</i>
           <br><br>
           <form name="include" method="post" action="">
           <div id="elements" style="margin-top:20px;">
@@ -128,7 +128,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
         <?php
         echo "Você contratou o(s) seguinte(s) curso(s): <br>";        
         foreach( $this->coursesAndQuantity as $key ){
-            echo $key['quantity'] . " vagas para o curso de: " .  $key['name'] . "<br>";
+            echo $key['quantity'] . " vaga(s) para o curso de: " .  $key['name'] . "<br>";
         }   
         echo "<br>";        
         ?>
@@ -161,7 +161,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
               $safeCourse = sanitize_text_field( $_POST['curso'][$w] );
 
               $curuser = wc_create_new_customer($safeEmail, $safeName, $senha);
-              if( is_wp_error($curuser) ){
+              if( is_wp_error( $curuser ) ){
                 echo $curuser->get_error_message();
                 echo "<p><strong>" . $safeName . " - " . $safeEmail . "</strong></p><br>";
               }else{
@@ -196,7 +196,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
       $coursesPurchased = new Sensei_Course();  
       $i=0;
       foreach($this->courses as $crp){        
-        $itemCourse = $coursesPurchased->get_product_courses( $crp );               
+        $itemCourse = $coursesPurchased->get_product_courses( $crp );                      
         foreach($itemCourse as $key => $value){            
             $this->coursesPurchasedArray[$i]['ID'] = $value->ID;
             $this->coursesPurchasedArray[$i]['name'] = $value->post_title;
