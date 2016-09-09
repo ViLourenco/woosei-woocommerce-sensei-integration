@@ -68,7 +68,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
       $arrayCourseOrdersByUser = $courseOrder->get_user_product_orders( $this->userid, '' );      
       $p = 0;
       foreach ( $arrayCourseOrdersByUser as $key => $value ){      
-          $courseOrder = new WC_Order( $value->ID );                               
+          $courseOrder = new WC_Order( $value->ID );                                       
           foreach ( $courseOrder->get_items() as $keyOrder => $courseOrder ){
             $this->courses[] = $courseOrder['product_id']; 
             $this->coursesAndQuantity[$p]['name'] = $courseOrder['name'];                       
@@ -98,6 +98,35 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
     private function woosei_displayForm(){
     ?>
       <div id="wpbody" role="main">
+
+          <h1>Seus cursos e quantidades</h1>
+          <?php        
+            echo "Você contratou o(s) seguinte(s) curso(s): <br>";        
+            foreach( $this->coursesAndQuantity as $key ){
+                echo "<strong>" . $key['quantity'] . "</strong> vaga(s) para o curso de: " .  $key['name'] . "<br>";
+            }   
+            echo "<br>";        
+          ?>
+
+          <h1>Seus colaboradores</h1>        
+        
+          <?php
+          $user_query = new WP_User_Query( 
+            array( 
+              'meta_key' => 'userParent', 
+              'meta_value' => $this->userid 
+            ) 
+          );
+
+          foreach($user_query->get_results() as $userData){
+              $idCustomer = $userData->ID;
+              echo "<strong>Login:</strong> " . $userData->display_name . "<br>";
+              echo "<strong>Email:</strong> " . $userData->user_email . "<br>";
+              echo "<strong>CPF:</strong> " . get_user_meta($idCustomer, 'cpf', 'true');
+              echo "<br><br>";
+          }
+          ?>              
+
           <h1>Inclusão de Usuários</h1>
           <i>Insira abaixo os colaboradores que deverão receber as senhas para o(s) curso(s):</i>
           <br><br>
@@ -122,33 +151,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
             <input type="submit" name="enviar" value="Cadastrar Colaborador (es)" class="button button-primary" style="width:auto">
             </p>
           </form>
-
-        <h1>Seus colaboradores</h1>
-
-        <?php
-        echo "Você contratou o(s) seguinte(s) curso(s): <br>";        
-        foreach( $this->coursesAndQuantity as $key ){
-            echo $key['quantity'] . " vaga(s) para o curso de: " .  $key['name'] . "<br>";
-        }   
-        echo "<br>";        
-        ?>
         
-        <?php
-        $user_query = new WP_User_Query( 
-          array( 
-            'meta_key' => 'userParent', 
-            'meta_value' => $this->userid 
-          ) 
-        );
-
-        foreach($user_query->get_results() as $userData){
-            $idCustomer = $userData->ID;
-            echo "<strong>Login:</strong> " . $userData->display_name . "<br>";
-            echo "<strong>Email:</strong> " . $userData->user_email . "<br>";
-            echo "<strong>CPF:</strong> " . get_user_meta($idCustomer, 'cpf', 'true');
-            echo "<br><br>";
-        }
-        ?>    
 
           <?php
           if( isset( $_POST['enviar'] ) ){ 
@@ -160,7 +163,13 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
               $safeName = sanitize_text_field( $_POST['nome'][$w] );
               $safeCPF = sanitize_text_field( $_POST['cpf'][$w] );
               $safeCourse = sanitize_text_field( $_POST['curso'][$w] );
-
+                            
+              $countCoursesQuantity = count( $_POST['curso'] );
+              if( $countCoursesQuantity > $this->coursesAndQuantity[$w]['quantity'] ){
+                $msg = "<strong>Cadastros não realizados</strong> - Atenção, é permitido apenas " . $this->coursesAndQuantity[$w]['quantity'] . " vagas para o <strong>" . $this->coursesPurchasedArray[$w]['name'] . "</strong> você tentou cadastrar " . $countCoursesQuantity . "!";
+                wc_print_notice( $msg, 'error' );                    
+                break;                
+              }                 
               $curuser = wc_create_new_customer($safeEmail, $safeName, $senha);
               if( is_wp_error( $curuser ) ){
                 echo $curuser->get_error_message();
@@ -182,7 +191,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
                   $headers = array('Content-Type: text/html; charset=UTF-8');                              
                   wp_mail($safeEmail, 'Você ganhou um curso!', $message, $headers);
                 }               
-              }       
+              }                             
             }
           }
           ?>
@@ -191,7 +200,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
     }
 
     /**
-    * Store the id and name of the purchased courses in an array. 
+    * Store the id, name and product_id of the purchased courses in an array. 
     */
     private function woosei_getCoursesPurchased(){
       $coursesPurchased = new Sensei_Course();  
@@ -201,6 +210,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
         foreach($itemCourse as $key => $value){            
             $this->coursesPurchasedArray[$i]['ID'] = $value->ID;
             $this->coursesPurchasedArray[$i]['name'] = $value->post_title;
+            $this->coursesPurchasedArray[$i]['product_id'] = $crp;
             $i++;
         }
       }           
