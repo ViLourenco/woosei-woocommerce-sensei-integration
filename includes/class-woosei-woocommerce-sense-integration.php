@@ -137,8 +137,9 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
         $user_query = new WP_User_Query( 
           array( 
             'meta_key' => 'userParent', 
-            'meta_value' => $this->userid ) 
-          );
+            'meta_value' => $this->userid 
+          ) 
+        );
 
         foreach($user_query->get_results() as $userData){
             $idCustomer = $userData->ID;
