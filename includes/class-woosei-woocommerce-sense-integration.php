@@ -68,12 +68,13 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
       $arrayCourseOrdersByUser = $courseOrder->get_user_product_orders( $this->userid, '' );      
       $p = 0;
       foreach ( $arrayCourseOrdersByUser as $key => $value ){      
-          $courseOrder = new WC_Order( $value->ID );                                       
-          foreach ( $courseOrder->get_items() as $keyOrder => $courseOrder ){
-            $this->courses[] = $courseOrder['product_id']; 
-            $this->coursesAndQuantity[$p]['name'] = $courseOrder['name'];                       
-            $this->coursesAndQuantity[$p]['product_id'] = $courseOrder['product_id'];
-            $this->coursesAndQuantity[$p]['quantity'] = $courseOrder['qty'];            
+          $courseOrderObj = new WC_Order( $value->ID );                         
+          foreach ( $courseOrderObj->get_items() as $keyOrder => $courseOrderItem ){            
+            $this->courses[] = $courseOrderItem['product_id']; 
+            $this->coursesAndQuantity[$p]['name'] = $courseOrderItem['name'];                       
+            $this->coursesAndQuantity[$p]['product_id'] = $courseOrderItem['product_id'];
+            $this->coursesAndQuantity[$p]['quantity'] = $courseOrderItem['qty']; 
+            $this->coursesAndQuantity[$p]['order_id'] = $courseOrderObj->id;                       
             $p++;
           }
       }      
@@ -103,11 +104,10 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
           <?php        
             echo "Você contratou o(s) seguinte(s) curso(s): <br>";        
             foreach( $this->coursesAndQuantity as $key ){
-                echo "<strong>" . $key['quantity'] . "</strong> vaga(s) para o curso de: " .  $key['name'] . "<br>";
+                echo "<strong>" . $key['quantity'] . "</strong> vaga(s) para o curso de: " .  $key['name'] . " Pedido: " . $key['order_id'] . "<br>";
             }   
             echo "<br>";        
-          ?>
-
+          ?>          
           <h1>Seus colaboradores</h1>        
         
           <?php
@@ -178,7 +178,7 @@ class WooSei_WooCommerce_Sensei_Integration_admin {
                 update_user_meta( $curuser, 'cpf', $safeCPF );
                 update_user_meta( $curuser, 'userParent', $this->userid );                
                 //echo "<p><strong>Usuário: " . $_POST['nome'][$w] . " - " . $_POST['email'][$w] . " criado com sucesso, permissão para o curso: " . $_POST['curso'][$w] . "</strong></p>";
-                echo "<p>Usuário(s) criado(s) com sucesso.</p><br>";
+                echo "<p>Usuário(s) criado(s) com sucesso.</p>";
                 $returnPermission = Sensei_Utils::user_start_course($curuser, $safeCourse); 
                 $permalink = trailingslashit( get_home_url() ) . 'meus-cursos';                
                 if($returnPermission){
