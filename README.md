@@ -4,3 +4,5 @@ This is a custom plugin build for some companies to buy online courses, create u
 When some course is bought by a company, a form will be displayed in their "My Account" page, enabling to create users and give the access to the course.
 
 Still in Portuguese but I'll translate.
+
+Contributes are welcome!
